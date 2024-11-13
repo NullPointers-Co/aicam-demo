@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "ppp-demo-docker"
+version = "0.1.0"
+description = ""
+authors = ["chann1n9"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+opencv-python = "^4.10.0.84"
+ultralytics = "^8.3.29"
+click = "^8.1.7"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
