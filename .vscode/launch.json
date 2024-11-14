@@ -5,7 +5,28 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "启动 detect.py",
+            "name": "运行当前文件",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}/",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "测试 segment.py",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/segment.py",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "测试 pose.py",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/pose.py",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "测试 detect.py",
             "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}/detect.py",
