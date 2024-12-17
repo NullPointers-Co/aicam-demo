@@ -45,17 +45,18 @@ RUN echo "done 0" \
     && curl -sSL https://install.python-poetry.org | python3 - \
     && poetry config virtualenvs.in-project true
 
-WORKDIR /workspace/ppp-demo-docker
+WORKDIR /workspaces/ppp-demo-docker
 COPY images images
 COPY *.py .
 COPY poetry.lock pyproject.toml .
 
 RUN poetry install \
     && mkdir -p weights \
-    && curl -L -o weights/yolov11n.pt "https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11n.pt"
+    && curl -L -o weights/yolo11n.pt "https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11n.pt" \
+    && curl -L -o weights/yolo11n-pose.pt "https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11n-pose.pt"
 
-ENV TARGET="images/target.jpeg"
-ENV REFERENCE="images/reference.jpeg"
-ENV CONFIDENCE="0.35"
+RUN /workspaces/ppp-demo-docker/.venv/bin/python -c "from ultralytics import YOLO"
 
-CMD ["/bin/sh", "-c", ".venv/bin/python cmdlt.py --target ${TARGET} --reference ${REFERENCE} --confidence ${CONFIDENCE}"]
+ENTRYPOINT ["/workspaces/ppp-demo-docker/.venv/bin/python", "/workspaces/ppp-demo-docker/cmdlt.py"]
+
+CMD ["--help"]
