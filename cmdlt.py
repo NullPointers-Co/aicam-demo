@@ -38,7 +38,7 @@ def advise(target, reference, confidence):
 @click.option('--show-box', is_flag=True, help='Prevew detetct box')
 def milling(type, stdio, out, input, weight, show_origin, show_box, silent):
     if not weight:
-        weight = 'weights/yolov11n-pose.pt'
+        weight = 'weights/yolo11n-pose.pt'
     assert os.path.exists(weight), "Weight file not found"
 
     def get_out_file_name(out):

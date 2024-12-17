@@ -5,7 +5,7 @@ import cv2
 from ultralytics import YOLO
 
 # load the pre-trained model
-model = YOLO('weights/yolov11n.pt')
+model = YOLO('weights/yolo11n.pt')
 
 
 def format_output(result):
