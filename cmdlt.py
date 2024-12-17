@@ -60,6 +60,7 @@ def milling(type, stdio, out, input, weight, show_origin, show_box, silent):
         else:
             dirname = os.path.dirname(out)
             assert os.path.exists(dirname), f"Path not exists: {dirname}"
+            out_file_name = out
 
         assert out_file_name, "Output file name not generated"
         return out_file_name
