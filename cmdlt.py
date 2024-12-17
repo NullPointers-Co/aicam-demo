@@ -77,7 +77,8 @@ def milling(type, stdio, out, input, weight, show_origin, show_box, silent):
             f"Output to: {out_file_name}")
 
     if type == 'preview':
-        preview(weight, input, out_file_name, origin=show_origin, box=show_box)
+        preview(weight, input, out_file_name, origin=show_origin,
+                box=show_box, verbose=not silent)
     elif type == 'dataset':
         dataset = mill(weight, input, verbose=not silent)
         if stdio:

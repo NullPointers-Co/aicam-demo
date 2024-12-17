@@ -3,7 +3,7 @@ import cv2
 from ultralytics import YOLO
 
 
-def preview(weights, video_path, out_file_path, origin=False, box=False):
+def preview(weights, video_path, out_file_path, origin=False, box=False, verbose=True):
     """
     Preview pose estimation on a video using a pre-trained YOLO model.
     Args:
@@ -17,6 +17,8 @@ def preview(weights, video_path, out_file_path, origin=False, box=False):
     """
 
     model = YOLO(weights)
+    if not verbose:
+        model.overrides['verbose'] = False
 
     COCO_KEYPOINTS = [
         "nose",          # 0
