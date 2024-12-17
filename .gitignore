@@ -1,3 +1,6 @@
 __pycache__
 .venv
-weights
+**/.DS_Store
+weights/*
+!weights/.gitkeep
+runs

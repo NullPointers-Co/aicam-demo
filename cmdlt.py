@@ -3,15 +3,21 @@ import os
 import click
 
 from detect import *
+from milling_pose import mill
+from preview_pose import preview
 
 DEFALT_TARGET = 'images/target.jpeg'
 DEFALT_RERERENCE = 'images/reference.jpeg'
 
-@click.command()
+@click.group()
+def cli():
+    pass
+
+@cli.command()
 @click.option('--target', '-t', type=click.Path(exists=True), default=DEFALT_TARGET, help='Target file to process')
 @click.option('--reference', '-f', type=click.Path(exists=True), default=DEFALT_RERERENCE, help='Reference file for comparison')
 @click.option('--confidence', '-c', type=float, default=0.35, help='Confidence threshold for object detection')
-def process_files(target, reference, confidence):
+def advise(target, reference, confidence):
     # check is exists
     if not os.path.exists(target):
         print(f"Target file not found: {target}")
@@ -66,5 +72,51 @@ def process_files(target, reference, confidence):
             else:
                 print(f"Match loss: {target_obj.cls[0]}")
 
+@cli.command()
+@click.option('--type', '-t', type=click.Choice(['preview', 'dataset']), required=True, help='Type of processing')
+@click.option('--out', '-o', type=click.Path(), help='Output file path')
+@click.option('--input', '-i', type=click.Path(exists=True), required=True, help='Input file path')
+@click.option('--silent', '-s', is_flag=True, help='Silent mode')
+@click.option('--weight', type=click.Path(exists=True), help='Customized weight file path')
+@click.option('--stdio', is_flag=True, help='output to stdio')
+@click.option('--show-origin', is_flag=True, help='Preview origin point')
+@click.option('--show-box', is_flag=True, help='Prevew detetct box')
+def milling(type, stdio, out, input, weight, show_origin, show_box, silent):
+    if not weight:
+        weight = 'weights/yolov11n-pose.pt'
+    assert os.path.exists(weight), "Weight file not found"
+
+    def get_out_file_name(out):
+        if os.path.isdir(out):
+            input_file_name, ext = os.path.basename(input).split('.')
+            if type == 'preview':
+                out_file_name = os.path.join(out, f"p_{input_file_name}.{ext}")
+            elif type == 'dataset':
+                out_file_name = os.path.join(out, f"p_{input_file_name}.json")
+        else:
+            dirname = os.path.dirname(out)
+            assert os.path.exists(dirname), f"Path not exists: {dirname}"
+            out_file_name = out
+        return out_file_name
+
+    if not stdio:
+        assert out, "Output file path is required"
+        out_file_name = get_out_file_name(out)
+
+    if not silent:
+        click.echo(f"Processing input file: {input}")
+        click.echo(f"Using weight file: {weight}")
+        click.echo(f"Output to: {out_file_name if not stdio else 'Stdandard Output'}")
+
+    if type == 'preview':
+        preview(weight, input, out_file_name, origin=show_origin, box=show_box)
+    elif type == 'dataset':
+        dataset = mill(weight, input, verbose=not silent)
+        if stdio:
+            click.echo(dataset.model_dump_json())
+        else:
+            with open(out_file_name, 'w') as f:
+                f.write(dataset.model_dump_json())
+
 if __name__ == '__main__':
-    process_files()
+    cli()

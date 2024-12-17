@@ -31,6 +31,14 @@
             "request": "launch",
             "program": "${workspaceFolder}/detect.py",
             "console": "integratedTerminal"
-        }
+        },
+        {
+            "name": "测试 cmdlt.py",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/cmdlt.py",
+            "args": ["milling", "-t", "dataset", "-i", "images/jljt.mp4", "--stdio"],
+            "console": "integratedTerminal"
+        },
     ]
 }
