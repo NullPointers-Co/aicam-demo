@@ -58,6 +58,8 @@ class Keypoint(BaseModel):
 class Normalization(BaseModel):
     ptc0: List[float]
     ptc1: List[float]
+    ptc0n: List[float]
+    ptc1n: List[float]
     ptc0_coco_idx: int
     ptc1_coco_idx: int
     root_l: float
@@ -189,6 +191,7 @@ def iterator_result(frame, model):
     for person in results:
         # box_center_x, box_center_y, _w, _h = person.boxes.xywh[0]
         keypoints = person.keypoints.data[0]
+        keypoints_xyn = person.keypoints.xyn[0]
 
         kps = [(i, (x, y, c)) for i, (x, y, c) in enumerate(keypoints)]
         sorted_kps = sorted(kps, key=lambda x: x[1][2], reverse=True)
@@ -196,27 +199,18 @@ def iterator_result(frame, model):
                                               in sorted_kps[:2]]
 
         root_l = torch.norm(torch.Tensor(ptc1) - torch.Tensor(ptc0))
+        ptc0n, ptc1n = keypoints_xyn[ptc0_idx], keypoints_xyn[ptc1_idx]
 
         m_keypoints = []
 
         for i, (x, y, conf) in enumerate(keypoints):
-            # TODO try new normalization
-            # Pn = (n_norm * x1, n_norm * y1)
-            n_norm = torch.norm(torch.Tensor([x, y]) - torch.Tensor(ptc0))
-            x0, y0 = ptc0
             x1, y1 = ptc1
-            r = n_norm / root_l
-            # end try new normalization
 
             m_keypoint = Keypoint(
-                # TODO add coco index
-                # 有没有必要都算一遍norm，只除root_l够吗
                 coco_idx=i,
                 keypoint=COCO_KEYPOINTS[i],
                 x=x / x1,
                 y=y / y1,
-                # x=x0 + r * ((x1 - x0) / root_l),
-                # y=y0 + r * ((y1 - y0) / root_l),
                 conf=conf
             )
 
@@ -224,6 +218,7 @@ def iterator_result(frame, model):
 
         m_normalization = Normalization(
             ptc0=ptc0, ptc1=ptc1,
+            ptc0n=ptc0n, ptc1n=ptc1n,
             ptc0_coco_idx=ptc0_idx,
             ptc1_coco_idx=ptc1_idx,
             root_l=root_l
@@ -350,9 +345,11 @@ if __name__ == "__main__":
     # video_path = "images/input1.mp4"
     # video_path = "images/output1.jpeg"
     # video_path = "images/output2.jpeg"
-    for path in ("images/yoga2.jpeg", "images/yoga3.jpeg"):
+    for path in ("images/c_720p15clip.mp4",):
         video_path = path
         data_set = mill(weight, video_path)
+        with open('images/c_720p15clip.json', 'w') as f:
+            f.write(data_set.model_dump_json())
         # print(data_set.model_dump_json())
-        print(data_set.frames[0].results[0].keypoints[0])
-        print(data_set.frames[0].results[0].normalization)
+        # print(data_set.frames[0].results[0].keypoints[0])
+        # print(data_set.frames[0].results[0].normalization)
