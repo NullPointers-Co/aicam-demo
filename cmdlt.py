@@ -5,6 +5,7 @@ import click
 from detect import detect_main
 from milling_pose import mill
 from preview_pose import preview
+from clip import get_crop_coordinates
 
 DEFALT_TARGET = 'images/target.jpeg'
 DEFALT_RERERENCE = 'images/reference.jpeg'
@@ -87,6 +88,20 @@ def milling(type, stdio, out, input, weight, show_origin, show_box, silent):
         else:
             with open(out_file_name, 'w') as f:
                 f.write(dataset.model_dump_json())
+
+
+@cli.command()
+@click.option('--weight', '-w', type=click.Path(exists=True), help='Weight file path')
+@click.option('--input', '-i', type=click.Path(exists=True), required=True, help='Video file path')
+@click.option('--verbose', '-v', is_flag=True, help='Verbose mode')
+def clip(weight, input, verbose):
+    if not weight:
+        weight = 'weights/yolo11n.pt'
+
+    click.echo(f"Processing video file: {input}")
+    click.echo(f"Using weight file: {weight}")
+
+    get_crop_coordinates(weight, input, verbose)
 
 
 if __name__ == '__main__':
